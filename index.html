@@ -58,8 +58,9 @@
   <div id="scanning-overlay">Scan your card to start...</div>
 
   <!-- 3. AR Scene Setup -->
+  <!-- ADDED: autoStart: true; uiLoading: yes; uiScanning: yes; -->
   <a-scene 
-    mindar-image="imageTargetSrc: ./assets/targets.mind; filterMinCF:0.001; filterBeta: 0.01;" 
+    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiLoading: yes; uiScanning: yes; filterMinCF:0.001; filterBeta: 0.01;" 
     color-space="sRGB" 
     renderer="colorManagement: true, physicallyCorrectLights: true"
     vr-mode-ui="enabled: false" 
@@ -119,4 +120,4 @@
 
   </a-scene>
 </body>
-</html
+</html>
