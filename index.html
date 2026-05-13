@@ -41,7 +41,7 @@
       }
     });
 
-    // 2. "POP-UP" ANIMATION 
+    // 2. "POP-UP" ANIMATION
     AFRAME.registerComponent('pop-up', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
@@ -92,9 +92,11 @@
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity mindar-image-target="targetIndex: 0">
-      <a-entity position="0 0 0">
+      
+      <!-- MASTER TILT WRAPPER: Rotates the entire diorama 90 degrees back to face you straight on -->
+      <a-entity rotation="90 0 0" position="0 0 0.5">
         
-        <!-- BASE LEVEL (Added alphaTest to solve clipping) -->
+        <!-- BASE LEVEL -->
         <a-image scale-in="delay: 0" src="#img-platform" position="0 -0.05 0" width="0.8" height="0.4" material="transparent: true; alphaTest: 0.5"></a-image>
         <a-image scale-in="delay: 200" src="#img-cloud" position="0 0.5 -0.1" width="0.5" height="0.3" material="transparent: true; alphaTest: 0.5"></a-image>
 
@@ -125,13 +127,11 @@
         <!-- MILO -->
         <a-entity pop-up="delay: 1000" position="0 0.02 0.1" rotation="-90 0 0">
           <!-- 
-            OFFSET FIX: I added position="-0.25 0 0" here to slide him to the left. 
-            If he is still too far right, make the negative number larger (e.g. -0.4).
-            If he went too far left, make it smaller (e.g. -0.1).
+            OFFSET FIX: I changed position to a positive 0.35 to force him to the RIGHT side. 
           -->
           <a-gltf-model 
             src="#model-milo" 
-            position="-0.25 0 0" 
+            position="0.35 0 0" 
             rotation="90 0 0" 
             scale="0.25 0.25 0.25" 
             animation-mixer="clip: rigAction; loop: repeat;">
