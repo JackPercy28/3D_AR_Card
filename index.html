@@ -14,7 +14,7 @@
   </style>
 
   <script>
-    // 1. "SCALE-IN" ANIMATION
+    // 1. "SCALE-IN" ANIMATION (For Platform and Clouds)
     AFRAME.registerComponent('scale-in', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
@@ -41,11 +41,12 @@
       }
     });
 
-    // 2. "POP-UP" ANIMATION (Unified for 2D and 3D)
+    // 2. "POP-UP" ANIMATION (Unified! Folds EVERYTHING from flat to upright)
     AFRAME.registerComponent('pop-up', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
-        this.el.setAttribute('rotation', '-90 0 0');
+        // Start lying flat on the platform (-90)
+        this.el.setAttribute('rotation', '-90 0 0'); 
         
         const target = this.el.closest('[mindar-image-target]');
         if (target) {
@@ -53,7 +54,7 @@
             this.el.setAttribute('animation', {
               property: 'rotation',
               from: '-90 0 0',
-              to: '0 0 0',
+              to: '0 0 0', // Fold up to stand straight!
               dur: 1000,
               easing: 'easeOutElastic',
               delay: this.data.delay
@@ -93,45 +94,48 @@
 
     <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- MASTER TILT WRAPPER (Points the diorama at you) -->
-      <a-entity rotation="90 0 0" position="0 0 0.5">
+      <!-- 
+        THE MASTER TILT: rotation="-90 0 0" 
+        This is the secret sauce. It forces the physical card to act as the floor.
+        Everything inside this wrapper now treats "Y" as UP towards the sky, and "Z" as FORWARD towards your camera.
+      -->
+      <a-entity rotation="-90 0 0" position="0 0 0">
         
-        <!-- BASE LEVEL -->
-        <a-image scale-in="delay: 0" src="#img-platform" position="0 -0.05 0" width="0.8" height="0.4" material="transparent: true; alphaTest: 0.5"></a-image>
-        <a-image scale-in="delay: 200" src="#img-cloud" position="0 0.5 -0.1" width="0.5" height="0.3" material="transparent: true; alphaTest: 0.5"></a-image>
+        <!-- THE PLATFORM (Rotated to lay completely flat on the floor) -->
+        <a-image scale-in="delay: 0" src="#img-platform" position="0 0 0" rotation="-90 0 0" width="0.8" height="0.4" material="transparent: true; alphaTest: 0.5"></a-image>
+        
+        <!-- THE CLOUD (Hovering in the sky) -->
+        <a-image scale-in="delay: 200" src="#img-cloud" position="0 0.5 -0.1" rotation="0 0 0" width="0.5" height="0.3" material="transparent: true; alphaTest: 0.5"></a-image>
 
         <!-- THE SIGN BOARD -->
-        <a-entity pop-up="delay: 400" position="-0.35 -0.15 0.15" rotation="-90 0 0">
+        <a-entity pop-up="delay: 400" position="-0.3 0.125 0.15" rotation="-90 0 0">
           <a-image src="#img-board" width="0.35" height="0.25" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
 
-        <!-- TREES -->
-        <a-entity pop-up="delay: 500" position="-0.3 0.15 -0.05" rotation="-90 0 0">
+        <!-- TREES (Heights adjusted so they sit perfectly on the floor) -->
+        <a-entity pop-up="delay: 500" position="-0.3 0.3 -0.1" rotation="-90 0 0">
           <a-image src="#img-tree1" width="0.4" height="0.6" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
-        <a-entity pop-up="delay: 600" position="0.35 0.12 -0.05" rotation="-90 0 0">
+        <a-entity pop-up="delay: 600" position="0.35 0.275 -0.1" rotation="-90 0 0">
           <a-image src="#img-tree2" width="0.35" height="0.55" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
 
         <!-- GRASS CLUSTERS -->
-        <a-entity pop-up="delay: 700" position="-0.15 -0.2 0.08" rotation="-90 0 0">
+        <a-entity pop-up="delay: 700" position="-0.15 0.075 0.08" rotation="-90 0 0">
           <a-image src="#img-grass1" width="0.2" height="0.15" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
-        <a-entity pop-up="delay: 750" position="-0.4 -0.25 0.18" rotation="-90 0 0">
+        <a-entity pop-up="delay: 750" position="-0.4 0.06 0.18" rotation="-90 0 0">
           <a-image src="#img-grass2" width="0.15" height="0.12" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
-        <a-entity pop-up="delay: 800" position="0.2 -0.18 0.1" rotation="-90 0 0">
+        <a-entity pop-up="delay: 800" position="0.2 0.1 0.1" rotation="-90 0 0">
           <a-image src="#img-grass3" width="0.25" height="0.2" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
 
-        <!-- MILO'S ANIMATION WRAPPER -->
-        <!-- Notice the position here is "-0.2 0.02 0.1" to keep him centered-left -->
-        <!-- This wrapper folds up using the EXACT same logic as the trees -->
-        <a-entity pop-up="delay: 1000" position="-0.2 0.02 0.1" rotation="-90 0 0">
-          
-          <!-- MILO'S 3D MODEL -->
-          <!-- Position is 0 0 0 because the wrapper handles his location now -->
-          <!-- I have set rotation to 0 0 0. If he is STILL face-planting, change this one number to "-90 0 0". -->
+        <!-- 
+          MILO (The 3D Centerpiece)
+          He is now centered (X: 0) and uses the EXACT same pop-up code as the trees!
+        -->
+        <a-entity pop-up="delay: 1000" position="0 0 0.1" rotation="-90 0 0">
           <a-gltf-model 
             src="#model-milo" 
             position="0 0 0" 
@@ -139,7 +143,6 @@
             scale="0.25 0.25 0.25" 
             animation-mixer="clip: rigAction; loop: repeat;">
           </a-gltf-model>
-
         </a-entity>
 
       </a-entity>
