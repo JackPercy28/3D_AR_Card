@@ -41,19 +41,19 @@
       }
     });
 
-    // 2. "POP-UP" ANIMATION
+    // 2. "POP-UP" ANIMATION (Unified for 2D and 3D)
     AFRAME.registerComponent('pop-up', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
-        this.el.setAttribute('rotation', '-180 0 0');
+        this.el.setAttribute('rotation', '-90 0 0');
         
         const target = this.el.closest('[mindar-image-target]');
         if (target) {
           target.addEventListener('targetFound', () => {
             this.el.setAttribute('animation', {
               property: 'rotation',
-              from: '-180 0 0',
-              to: '-90 0 0',
+              from: '-90 0 0',
+              to: '0 0 0',
               dur: 1000,
               easing: 'easeOutElastic',
               delay: this.data.delay
@@ -93,7 +93,7 @@
 
     <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- MASTER TILT WRAPPER -->
+      <!-- MASTER TILT WRAPPER (Points the diorama at you) -->
       <a-entity rotation="90 0 0" position="0 0 0.5">
         
         <!-- BASE LEVEL -->
@@ -124,20 +124,22 @@
           <a-image src="#img-grass3" width="0.25" height="0.2" material="transparent: true; alphaTest: 0.5"></a-image>
         </a-entity>
 
-        <!-- MILO -->
-        <a-entity pop-up="delay: 1000" position="0 0.02 0.1" rotation="-90 0 0">
-          <!-- 
-            FINAL FIXES: 
-            1. position is now "-0.45" to heavily force him to the left.
-            2. rotation is back to "90 0 0" to stand him up.
-          -->
+        <!-- MILO'S ANIMATION WRAPPER -->
+        <!-- Notice the position here is "-0.2 0.02 0.1" to keep him centered-left -->
+        <!-- This wrapper folds up using the EXACT same logic as the trees -->
+        <a-entity pop-up="delay: 1000" position="-0.2 0.02 0.1" rotation="-90 0 0">
+          
+          <!-- MILO'S 3D MODEL -->
+          <!-- Position is 0 0 0 because the wrapper handles his location now -->
+          <!-- I have set rotation to 0 0 0. If he is STILL face-planting, change this one number to "-90 0 0". -->
           <a-gltf-model 
             src="#model-milo" 
-            position="-0.45 0 0" 
-            rotation="-90 0 0" 
+            position="0 0 0" 
+            rotation="0 0 0" 
             scale="0.25 0.25 0.25" 
             animation-mixer="clip: rigAction; loop: repeat;">
           </a-gltf-model>
+
         </a-entity>
 
       </a-entity>
