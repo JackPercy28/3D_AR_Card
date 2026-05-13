@@ -127,14 +127,14 @@
         <!-- MILO -->
         <a-entity pop-up="delay: 1000" position="0 0.02 0.1" rotation="-90 0 0">
           <!-- 
-            FIXES APPLIED: 
-            1. position is now "-0.15 0 0" (Sliding him to the left)
-            2. rotation is now "0 0 0" (Rotating him back 90 degrees)
+            FINAL FIXES: 
+            1. position is now "-0.45" to heavily force him to the left.
+            2. rotation is back to "90 0 0" to stand him up.
           -->
           <a-gltf-model 
             src="#model-milo" 
-            position="-0.15 0 0" 
-            rotation="0 0 0" 
+            position="-0.45 0 0" 
+            rotation="90 0 0" 
             scale="0.25 0.25 0.25" 
             animation-mixer="clip: rigAction; loop: repeat;">
           </a-gltf-model>
