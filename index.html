@@ -7,7 +7,6 @@
 
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-  <!-- Included extras for smooth animations -->
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
 
   <style>
@@ -15,12 +14,11 @@
   </style>
 
   <script>
-    // 1. "SCALE-IN" ANIMATION (For Backgrounds/Base)
+    // 1. "SCALE-IN" ANIMATION (For the Platform and Cloud)
     AFRAME.registerComponent('scale-in', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
         this.baseScale = { ...this.el.getAttribute('scale') };
-        // Start almost invisible to prevent A-Frame render glitches
         this.el.setAttribute('scale', '0.001 0.001 0.001');
         
         const target = this.el.closest('[mindar-image-target]');
@@ -43,11 +41,10 @@
       }
     });
 
-    // 2. "POP-UP" ANIMATION (For Trees, Grass, and House)
+    // 2. "POP-UP" ANIMATION (For the Sign, Trees, and Grass)
     AFRAME.registerComponent('pop-up', {
       schema: { delay: { type: 'number', default: 0 } },
       init: function () {
-        // Start rotated backward so it lies flat
         this.el.setAttribute('rotation', '-90 0 0');
         
         const target = this.el.closest('[mindar-image-target]');
@@ -56,7 +53,7 @@
             this.el.setAttribute('animation', {
               property: 'rotation',
               from: '-90 0 0',
-              to: '0 0 0', // Pops up to stand upright
+              to: '0 0 0',
               dur: 1000,
               easing: 'easeOutElastic',
               delay: this.data.delay
@@ -73,7 +70,6 @@
 </head>
 
 <body>
-  <!-- Removed the broken custom UI, relying on MindAR's native loaders -->
   <a-scene 
     mindar-image="imageTargetSrc: ./assets/targets.mind;" 
     color-space="sRGB" 
@@ -96,29 +92,41 @@
 
     <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- Base Wrapper -->
+      <!-- Content Wrapper -->
       <a-entity position="0 0 0">
         
-        <!-- BASE LEVEL (Scales in instantly) -->
-        <a-image scale-in="delay: 0" src="#img-board" position="0 0 0" width="1.2" height="0.9" transparent="true"></a-image>
-        <a-image scale-in="delay: 200" src="#img-platform" position="0 -0.05 0.01" width="0.7" height="0.4" transparent="true"></a-image>
-        <a-image scale-in="delay: 400" src="#img-cloud" position="0 0.6 -0.1" width="0.5" height="0.3" transparent="true"></a-image>
+        <!-- BASE LEVEL (Platform is now the center stage) -->
+        <a-image scale-in="delay: 0" src="#img-platform" position="0 -0.05 0" width="0.8" height="0.4" transparent="true"></a-image>
+        <a-image scale-in="delay: 200" src="#img-cloud" position="0 0.5 -0.1" width="0.5" height="0.3" transparent="true"></a-image>
 
-        <!-- FOLIAGE LEVEL (Pops up sequentially) -->
-        <a-entity pop-up="delay: 600" position="-0.35 0.2 0.02">
-          <a-image src="#img-tree1" width="0.3" height="0.45" transparent="true"></a-image>
+        <!-- THE SIGN BOARD (Small, front-left, pops up) -->
+        <a-entity pop-up="delay: 400" position="-0.35 -0.15 0.15" rotation="-90 0 0">
+          <a-image src="#img-board" width="0.35" height="0.25" transparent="true"></a-image>
+        </a-entity>
+
+        <!-- TREES (Background left & right) -->
+        <a-entity pop-up="delay: 500" position="-0.25 0.15 -0.05" rotation="-90 0 0">
+          <a-image src="#img-tree1" width="0.25" height="0.4" transparent="true"></a-image>
         </a-entity>
         
-        <a-entity pop-up="delay: 700" position="0.35 0.18 0.02">
-          <a-image src="#img-tree2" width="0.25" height="0.4" transparent="true"></a-image>
+        <a-entity pop-up="delay: 600" position="0.3 0.12 -0.05" rotation="-90 0 0">
+          <a-image src="#img-tree2" width="0.2" height="0.35" transparent="true"></a-image>
         </a-entity>
 
-        <a-entity pop-up="delay: 800" position="-0.45 -0.3 0.1">
-          <a-image src="#img-grass1" width="0.15" height="0.15" transparent="true"></a-image>
+        <!-- GRASS CLUSTERS (Brought closer together around the scene) -->
+        <!-- Grass next to the sign -->
+        <a-entity pop-up="delay: 700" position="-0.15 -0.2 0.08" rotation="-90 0 0">
+          <a-image src="#img-grass1" width="0.12" height="0.12" transparent="true"></a-image>
+        </a-entity>
+        
+        <!-- Tiny grass in front of the sign -->
+        <a-entity pop-up="delay: 750" position="-0.4 -0.25 0.18" rotation="-90 0 0">
+          <a-image src="#img-grass2" width="0.08" height="0.08" transparent="true"></a-image>
         </a-entity>
 
-        <a-entity pop-up="delay: 900" position="0.3 -0.3 0.1">
-          <a-image src="#img-grass3" width="0.15" height="0.15" transparent="true"></a-image>
+        <!-- Grass cluster on the right -->
+        <a-entity pop-up="delay: 800" position="0.2 -0.18 0.1" rotation="-90 0 0">
+          <a-image src="#img-grass3" width="0.14" height="0.14" transparent="true"></a-image>
         </a-entity>
 
       </a-entity>
