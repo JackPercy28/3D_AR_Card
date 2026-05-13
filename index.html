@@ -5,116 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AR Valley - MindAR & A-Frame</title>
 
-  <!-- 1. Core Libraries -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  <!-- Included extras for smooth animations -->
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
 
   <style>
     body { margin: 0; overflow: hidden; }
-    /* Simple loading overlay style */
-    #scanning-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex; justify-content: center; align-items: center;
-      color: white; font-family: sans-serif; z-index: 100;
-      pointer-events: none;
-    }
-    .hidden { display: none !important; }
   </style>
 
   <script>
-    // 2. Custom Component: Smooth Transitions
-    AFRAME.registerComponent('smooth-appear', {
+    // 1. "SCALE-IN" ANIMATION (For Backgrounds/Base)
+    AFRAME.registerComponent('scale-in', {
+      schema: { delay: { type: 'number', default: 0 } },
       init: function () {
-        const el = this.el;
-        const contentWrapper = el.querySelector('.ar-content');
-        const overlay = document.querySelector('#scanning-overlay');
-
-        // Initial State: Hidden
-        contentWrapper.setAttribute('scale', '0 0 0');
-
-        el.addEventListener('targetFound', () => {
-          overlay.classList.add('hidden');
-          contentWrapper.setAttribute('animation', {
-            property: 'scale',
-            to: '1 1 1',
-            dur: 1000,
-            easing: 'easeOutElastic'
+        this.baseScale = { ...this.el.getAttribute('scale') };
+        // Start almost invisible to prevent A-Frame render glitches
+        this.el.setAttribute('scale', '0.001 0.001 0.001');
+        
+        const target = this.el.closest('[mindar-image-target]');
+        if (target) {
+          target.addEventListener('targetFound', () => {
+            this.el.setAttribute('animation', {
+              property: 'scale',
+              from: '0.001 0.001 0.001',
+              to: `${this.baseScale.x} ${this.baseScale.y} ${this.baseScale.z}`,
+              dur: 1000,
+              easing: 'easeOutElastic',
+              delay: this.data.delay
+            });
           });
-        });
+          target.addEventListener('targetLost', () => {
+            this.el.removeAttribute('animation');
+            this.el.setAttribute('scale', '0.001 0.001 0.001');
+          });
+        }
+      }
+    });
 
-        el.addEventListener('targetLost', () => {
-          overlay.classList.remove('hidden');
-          contentWrapper.removeAttribute('animation');
-          contentWrapper.setAttribute('scale', '0 0 0');
-        });
+    // 2. "POP-UP" ANIMATION (For Trees, Grass, and House)
+    AFRAME.registerComponent('pop-up', {
+      schema: { delay: { type: 'number', default: 0 } },
+      init: function () {
+        // Start rotated backward so it lies flat
+        this.el.setAttribute('rotation', '-90 0 0');
+        
+        const target = this.el.closest('[mindar-image-target]');
+        if (target) {
+          target.addEventListener('targetFound', () => {
+            this.el.setAttribute('animation', {
+              property: 'rotation',
+              from: '-90 0 0',
+              to: '0 0 0', // Pops up to stand upright
+              dur: 1000,
+              easing: 'easeOutElastic',
+              delay: this.data.delay
+            });
+          });
+          target.addEventListener('targetLost', () => {
+             this.el.removeAttribute('animation');
+             this.el.setAttribute('rotation', '-90 0 0');
+          });
+        }
       }
     });
   </script>
 </head>
 
 <body>
-  <div id="scanning-overlay">Scan your card to start...</div>
-
-  <!-- 3. AR Scene Setup -->
-  <!-- ADDED: autoStart: true; uiLoading: yes; uiScanning: yes; -->
+  <!-- Removed the broken custom UI, relying on MindAR's native loaders -->
   <a-scene 
-    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiLoading: yes; uiScanning: yes; filterMinCF:0.001; filterBeta: 0.01;" 
+    mindar-image="imageTargetSrc: ./assets/targets.mind;" 
     color-space="sRGB" 
     renderer="colorManagement: true, physicallyCorrectLights: true"
     vr-mode-ui="enabled: false" 
     device-orientation-permission-ui="enabled: false">
     
-    <!-- 4. Asset Management -->
     <a-assets>
-      <!-- Base & Environment -->
-      <img id="img-board" src="./assets/Board.png">
+      <img id="img-board" src="./assets/board.png">
       <img id="img-platform" src="./assets/Platform.png">
       <img id="img-cloud" src="./assets/Cloud.png">
-      <!-- Foliage -->
       <img id="img-grass1" src="./assets/Grass1.png">
       <img id="img-grass2" src="./assets/Grass2.png">
       <img id="img-grass3" src="./assets/Grass3.png">
       <img id="img-tree1" src="./assets/Tree1.png">
       <img id="img-tree2" src="./assets/Tree2.png">
-      <!-- 3D Centerpiece -->
       <a-asset-item id="model-house" src="./assets/house.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- 5. Target Entity -->
-    <a-entity mindar-image-target="targetIndex: 0" smooth-appear>
+    <a-entity mindar-image-target="targetIndex: 0">
       
-      <!-- Content Wrapper -->
-      <a-entity class="ar-content">
+      <!-- Base Wrapper -->
+      <a-entity position="0 0 0">
         
-        <!-- Background Layer (Z: -0.1 to -0.01) -->
-        <a-image src="#img-cloud" position="0 0.6 -0.1" width="0.5" height="0.3" transparent="true"></a-image>
-        <a-image src="#img-tree1" position="-0.35 0.2 -0.02" width="0.3" height="0.45" transparent="true"></a-image>
-        <a-image src="#img-tree2" position="0.35 0.18 -0.02" width="0.25" height="0.4" transparent="true"></a-image>
+        <!-- BASE LEVEL (Scales in instantly) -->
+        <a-image scale-in="delay: 0" src="#img-board" position="0 0 0" width="1.2" height="0.9" transparent="true"></a-image>
+        <a-image scale-in="delay: 200" src="#img-platform" position="0 -0.05 0.01" width="0.7" height="0.4" transparent="true"></a-image>
+        <a-image scale-in="delay: 400" src="#img-cloud" position="0 0.6 -0.1" width="0.5" height="0.3" transparent="true"></a-image>
 
-        <!-- Base Layer (Z: 0) -->
-        <a-plane src="#img-board" position="0 0 0" width="1.2" height="0.9" transparent="true" rotation="0 0 0"></a-plane>
-
-        <!-- Middle Layer (Z: 0.01 to 0.05) -->
-        <a-image src="#img-platform" position="0 -0.05 0.01" width="0.7" height="0.4" transparent="true"></a-image>
+        <!-- FOLIAGE LEVEL (Pops up sequentially) -->
+        <a-entity pop-up="delay: 600" position="-0.35 0.2 0.02">
+          <a-image src="#img-tree1" width="0.3" height="0.45" transparent="true"></a-image>
+        </a-entity>
         
-        <!-- 3D Model: Main focal point -->
-        <a-gltf-model src="#model-house" position="0 0 0.05" rotation="90 0 0" scale="0.1 0.1 0.1"></a-gltf-model>
+        <a-entity pop-up="delay: 700" position="0.35 0.18 0.02">
+          <a-image src="#img-tree2" width="0.25" height="0.4" transparent="true"></a-image>
+        </a-entity>
 
-        <!-- Foreground Layer (Z: 0.1+) -->
-        <!-- Scattered grass for a "pop-out" effect -->
-        <a-image src="#img-grass1" position="-0.45 -0.3 0.1" width="0.15" height="0.15" transparent="true"></a-image>
-        <a-image src="#img-grass2" position="-0.2 -0.35 0.12" width="0.1" height="0.1" transparent="true"></a-image>
-        <a-image src="#img-grass3" position="0.3 -0.3 0.1" width="0.15" height="0.15" transparent="true"></a-image>
-        <a-image src="#img-grass1" position="0.5 -0.25 0.11" width="0.12" height="0.12" transparent="true"></a-image>
+        <a-entity pop-up="delay: 800" position="-0.45 -0.3 0.1">
+          <a-image src="#img-grass1" width="0.15" height="0.15" transparent="true"></a-image>
+        </a-entity>
+
+        <a-entity pop-up="delay: 900" position="0.3 -0.3 0.1">
+          <a-image src="#img-grass3" width="0.15" height="0.15" transparent="true"></a-image>
+        </a-entity>
+
+        <!-- 3D MODEL CENTERPIECE (Scales in last) -->
+        <a-entity scale-in="delay: 1100" position="0 0 0.05">
+          <a-gltf-model src="#model-house" rotation="90 0 0" scale="0.1 0.1 0.1"></a-gltf-model>
+        </a-entity>
 
       </a-entity>
     </a-entity>
 
-    <!-- Basic Lights -->
     <a-light type="ambient" intensity="0.8"></a-light>
     <a-light type="directional" position="1 2 1" intensity="0.5"></a-light>
 
