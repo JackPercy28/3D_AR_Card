@@ -82,7 +82,7 @@
     device-orientation-permission-ui="enabled: false">
     
     <a-assets>
-      <img id="img-board" src="./assets/board.png">
+      <img id="img-board" src="./assets/Board.png">
       <img id="img-platform" src="./assets/Platform.png">
       <img id="img-cloud" src="./assets/Cloud.png">
       <img id="img-grass1" src="./assets/Grass1.png">
@@ -90,7 +90,6 @@
       <img id="img-grass3" src="./assets/Grass3.png">
       <img id="img-tree1" src="./assets/Tree1.png">
       <img id="img-tree2" src="./assets/Tree2.png">
-      <a-asset-item id="model-house" src="./assets/house.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -120,11 +119,6 @@
 
         <a-entity pop-up="delay: 900" position="0.3 -0.3 0.1">
           <a-image src="#img-grass3" width="0.15" height="0.15" transparent="true"></a-image>
-        </a-entity>
-
-        <!-- 3D MODEL CENTERPIECE (Scales in last) -->
-        <a-entity scale-in="delay: 1100" position="0 0 0.05">
-          <a-gltf-model src="#model-house" rotation="90 0 0" scale="0.1 0.1 0.1"></a-gltf-model>
         </a-entity>
 
       </a-entity>
